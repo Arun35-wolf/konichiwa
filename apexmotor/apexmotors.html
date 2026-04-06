@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>APEX MOTORS — Premium Vehicles</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --card: #151515;
+      --border: #222222;
+      --accent: #c9a84c;
+      --accent2: #e8c97a;
+      --red: #d94f3d;
+      --text: #f0ede8;
+      --muted: #888880;
+      --light: #d0cdc8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 10px; height: 10px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease;
+    }
+    .cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid var(--accent);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.35s ease, width 0.3s, height 0.3s, opacity 0.3s;
+      opacity: 0.5;
+    }
+    body:hover .cursor { transform: translate(-50%, -50%); }
+    body:hover .cursor-ring { transform: translate(-50%, -50%); }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 48px;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.98), transparent);
+      backdrop-filter: blur(2px);
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 4px;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--text); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      color: var(--light);
+      text-decoration: none;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+      font-weight: 500;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-cta {
+      background: var(--accent);
+      color: #000;
+      padding: 10px 26px;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .nav-cta:hover { background: var(--accent2); transform: translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 48px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: 
+        radial-gradient(ellipse 80% 60% at 60% 40%, rgba(201,168,76,0.08) 0%, transparent 60%),
+        linear-gradient(135deg, #0a0a0a 0%, #111 50%, #0d0d0d 100%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image: 
+        linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .hero-car-img {
+      position: absolute;
+      right: -80px; bottom: 0;
+      width: 72%;
+      opacity: 0.9;
+      animation: floatIn 1.2s cubic-bezier(0.22,1,0.36,1) forwards;
+    }
+    @keyframes floatIn {
+      from { transform: translateX(120px) scale(0.96); opacity: 0; }
+      to { transform: translateX(0) scale(1); opacity: 0.9; }
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 2;
+      animation: fadeUp 0.8s 0.2s both;
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(5rem, 12vw, 11rem);
+      line-height: 0.9;
+      letter-spacing: 2px;
+      position: relative; z-index: 2;
+      animation: fadeUp 0.8s 0.35s both;
+    }
+    .hero-title em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--accent);
+      display: block;
+    }
+    .hero-sub {
+      font-size: 1rem;
+      color: var(--muted);
+      max-width: 380px;
+      line-height: 1.7;
+      margin-top: 24px;
+      position: relative; z-index: 2;
+      animation: fadeUp 0.8s 0.5s both;
+    }
+    .hero-actions {
+      display: flex; gap: 16px; margin-top: 40px;
+      position: relative; z-index: 2;
+      animation: fadeUp 0.8s 0.65s both;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      padding: 16px 36px;
+      font-size: 0.78rem;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      font-weight: 600;
+      border: none;
+      cursor: none;
+      transition: background 0.2s, transform 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-2px); }
+    .btn-outline {
+      background: transparent;
+      color: var(--light);
+      padding: 16px 36px;
+      font-size: 0.78rem;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      cursor: none;
+      transition: border-color 0.2s, color 0.2s;
+      text-decoration: none;
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-stats {
+      position: absolute;
+      right: 48px; bottom: 80px;
+      display: flex; gap: 48px;
+      z-index: 2;
+      animation: fadeUp 0.8s 0.8s both;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.8rem;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .stat-label {
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* TICKER */
+    .ticker {
+      background: var(--accent);
+      padding: 12px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ticker-track {
+      display: inline-flex;
+      animation: ticker 30s linear infinite;
+      gap: 64px;
+    }
+    .ticker-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 0.95rem;
+      letter-spacing: 4px;
+      color: #000;
+    }
+    @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* SECTION COMMON */
+    section { padding: 100px 48px; }
+    .section-label {
+      font-size: 0.68rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      line-height: 0.95;
+      margin-bottom: 16px;
+    }
+    .section-title em {
+      font-family: 'DM Serif Display', serif;
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    /* FILTER BAR */
+    .filter-bar {
+      display: flex; gap: 8px;
+      margin-bottom: 56px;
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: 9px 22px;
+      font-size: 0.73rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: none;
+      transition: all 0.2s;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+
+    /* CARS GRID */
+    .cars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 2px;
+    }
+    .car-card {
+      background: var(--card);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s cubic-bezier(0.22,1,0.36,1);
+      cursor: none;
+    }
+    .car-card:hover { transform: translateY(-6px); z-index: 1; }
+    .car-card.hidden { display: none; }
+
+    .car-img-wrap {
+      height: 240px;
+      background: linear-gradient(135deg, #141414, #1c1c1c);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .car-emoji {
+      font-size: 7rem;
+      transition: transform 0.5s cubic-bezier(0.22,1,0.36,1);
+      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
+    }
+    .car-card:hover .car-emoji { transform: scale(1.08) translateX(10px); }
+    .car-badge {
+      position: absolute; top: 16px; left: 16px;
+      padding: 5px 12px;
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .badge-new { background: var(--accent); color: #000; }
+    .badge-hot { background: var(--red); color: #fff; }
+    .badge-sale { background: #1a5c2e; color: #5ddb8a; }
+
+    .car-body { padding: 24px 28px 28px; }
+    .car-type {
+      font-size: 0.62rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .car-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.7rem;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+    .car-model { font-size: 0.82rem; color: var(--muted); margin-bottom: 16px; }
+    .car-specs {
+      display: flex; gap: 20px;
+      margin-bottom: 20px;
+    }
+    .spec { text-align: center; }
+    .spec-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      color: var(--light);
+    }
+    .spec-key {
+      font-size: 0.58rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .car-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+    .car-price {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.9rem;
+      color: var(--accent);
+      letter-spacing: 1px;
+    }
+    .car-price-label {
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .btn-card {
+      background: var(--border);
+      border: none;
+      color: var(--text);
+      padding: 10px 18px;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: none;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-card:hover { background: var(--accent); color: #000; }
+
+    /* FEATURED BANNER */
+    .featured {
+      background: var(--surface);
+      margin: 0;
+      padding: 100px 48px;
+      position: relative;
+      overflow: hidden;
+    }
+    .featured-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .featured-price-tag {
+      display: inline-block;
+      background: var(--accent);
+      color: #000;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 3.5rem;
+      padding: 8px 24px;
+      margin-bottom: 24px;
+      letter-spacing: 2px;
+    }
+    .featured-desc {
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 32px;
+      font-size: 0.95rem;
+    }
+    .featured-spec-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .featured-spec-item {
+      padding: 16px 20px;
+      background: var(--card);
+      border-left: 2px solid var(--accent);
+    }
+    .fsi-label {
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .fsi-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.3rem;
+      color: var(--light);
+    }
+    .featured-visual {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14rem;
+      position: relative;
+    }
+    .featured-glow {
+      position: absolute;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(201,168,76,0.15), transparent 70%);
+      border-radius: 50%;
+      animation: pulse 3s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* BRANDS */
+    .brands { background: var(--bg); }
+    .brands-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2px;
+      margin-top: 56px;
+    }
+    .brand-item {
+      flex: 1;
+      min-width: 140px;
+      padding: 32px 20px;
+      background: var(--card);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      cursor: none;
+      transition: background 0.2s;
+    }
+    .brand-item:hover { background: var(--surface); }
+    .brand-icon { font-size: 2rem; }
+    .brand-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 3px;
+      color: var(--muted);
+      transition: color 0.2s;
+    }
+    .brand-item:hover .brand-name { color: var(--accent); }
+
+    /* TESTIMONIALS */
+    .testimonials { background: var(--surface); }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2px;
+      margin-top: 56px;
+    }
+    .testimonial {
+      background: var(--card);
+      padding: 36px;
+      position: relative;
+    }
+    .testimonial::before {
+      content: '"';
+      font-family: 'DM Serif Display', serif;
+      font-size: 8rem;
+      color: var(--accent);
+      opacity: 0.15;
+      position: absolute;
+      top: -10px; left: 24px;
+      line-height: 1;
+    }
+    .testimonial-text {
+      font-size: 0.9rem;
+      line-height: 1.8;
+      color: var(--light);
+      margin-bottom: 24px;
+      position: relative; z-index: 1;
+    }
+    .testimonial-author { display: flex; align-items: center; gap: 14px; }
+    .author-avatar {
+      width: 44px; height: 44px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+    }
+    .author-name {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+    .author-role { font-size: 0.72rem; color: var(--muted); }
+    .stars { color: var(--accent); font-size: 0.75rem; margin-bottom: 12px; }
+
+    /* WHY US */
+    .why { background: var(--bg); }
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      margin-top: 56px;
+    }
+    .why-card {
+      background: var(--card);
+      padding: 40px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.2s;
+    }
+    .why-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 0; height: 2px;
+      background: var(--accent);
+      transition: width 0.4s ease;
+    }
+    .why-card:hover::after { width: 100%; }
+    .why-card:hover { background: var(--surface); }
+    .why-icon { font-size: 2.5rem; margin-bottom: 20px; }
+    .why-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    .why-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+
+    /* CTA SECTION */
+    .cta-section {
+      background: var(--accent);
+      padding: 80px 48px;
+      text-align: center;
+    }
+    .cta-section .section-title { color: #000; }
+    .cta-section .section-title em { color: rgba(0,0,0,0.4); }
+    .cta-desc { color: rgba(0,0,0,0.6); margin-bottom: 36px; font-size: 1rem; }
+    .btn-dark {
+      background: #000;
+      color: var(--accent);
+      padding: 18px 48px;
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      font-weight: 600;
+      border: none;
+      cursor: none;
+      font-family: 'DM Sans', sans-serif;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-dark:hover { background: #111; color: var(--accent2); }
+
+    /* FOOTER */
+    footer {
+      background: #050505;
+      padding: 72px 48px 36px;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 56px;
+    }
+    .footer-brand-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      letter-spacing: 4px;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+    .footer-tagline { font-size: 0.85rem; color: var(--muted); line-height: 1.7; max-width: 280px; }
+    .footer-col-title {
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 3px;
+      font-size: 1rem;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.83rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+    .footer-copy { font-size: 0.72rem; color: var(--muted); letter-spacing: 1px; }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 500;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--card);
+      max-width: 600px; width: 90%;
+      padding: 48px;
+      position: relative;
+      transform: translateY(30px);
+      transition: transform 0.3s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-close {
+      position: absolute; top: 20px; right: 24px;
+      background: none; border: none;
+      color: var(--muted); font-size: 1.5rem;
+      cursor: none;
+      transition: color 0.2s;
+    }
+    .modal-close:hover { color: var(--accent); }
+    .modal-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+    .modal-price { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--accent); margin-bottom: 24px; }
+    .modal-detail { font-size: 0.85rem; color: var(--muted); line-height: 1.8; margin-bottom: 28px; }
+    .modal-specs {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; margin-bottom: 32px;
+    }
+    .modal-spec {
+      padding: 14px 16px;
+      background: var(--surface);
+      border-left: 2px solid var(--accent);
+    }
+    .modal-spec-k { font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    .modal-spec-v { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; margin-top: 2px; }
+
+    /* SEARCH BAR */
+    .search-wrap {
+      display: flex; gap: 0;
+      margin-bottom: 40px;
+      max-width: 600px;
+    }
+    .search-input {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-right: none;
+      color: var(--text);
+      padding: 14px 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus { border-color: var(--accent); }
+    .search-btn {
+      background: var(--accent);
+      border: none;
+      color: #000;
+      padding: 14px 24px;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+      cursor: none;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .search-btn:hover { background: var(--accent2); }
+
+    /* SCROLL ANIMATIONS */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      .nav-links, .nav-cta { display: none; }
+      section { padding: 64px 24px; }
+      .hero { padding: 0 24px 64px; }
+      .hero-car-img { width: 110%; right: -20px; opacity: 0.3; }
+      .hero-stats { right: 24px; bottom: 64px; gap: 24px; }
+      .stat-num { font-size: 2rem; }
+      .featured-inner { grid-template-columns: 1fr; gap: 40px; }
+      .featured-visual { font-size: 8rem; }
+      .why-grid { grid-template-columns: 1fr 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .why-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .modal { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#"><span>APEX</span> MOTORS</a>
+    <ul class="nav-links">
+      <li><a href="#inventory">Inventory</a></li>
+      <li><a href="#featured">Featured</a></li>
+      <li><a href="#brands">Brands</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+    <a href="#contact" class="nav-cta">Book a Test Drive</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <svg class="hero-car-img" viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#2a2a2a"/>
+          <stop offset="50%" style="stop-color:#1a1a1a"/>
+          <stop offset="100%" style="stop-color:#0d0d0d"/>
+        </linearGradient>
+        <linearGradient id="roofGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#333"/>
+          <stop offset="100%" style="stop-color:#111"/>
+        </linearGradient>
+        <linearGradient id="glassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#c9a84c;stop-opacity:0.3"/>
+          <stop offset="100%" style="stop-color:#1a1a2e;stop-opacity:0.8"/>
+        </linearGradient>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="8" result="blur"/>
+          <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+        </filter>
+        <radialGradient id="wheelGrad" cx="50%" cy="50%">
+          <stop offset="0%" style="stop-color:#555"/>
+          <stop offset="60%" style="stop-color:#222"/>
+          <stop offset="100%" style="stop-color:#111"/>
+        </radialGradient>
+      </defs>
+      <!-- Ground shadow -->
+      <ellipse cx="450" cy="375" rx="340" ry="18" fill="rgba(0,0,0,0.5)"/>
+      <!-- Body -->
+      <path d="M80 280 L100 230 L160 180 L280 150 L420 140 L560 145 L680 160 L760 200 L800 240 L820 280 Z" fill="url(#bodyGrad)" stroke="#333" stroke-width="1"/>
+      <!-- Roof -->
+      <path d="M200 180 L260 130 L380 110 L520 108 L620 118 L680 155 L560 145 L420 140 L280 150 L200 180Z" fill="url(#roofGrad)"/>
+      <!-- Glass front -->
+      <path d="M580 115 L665 155 L660 165 L570 128Z" fill="url(#glassGrad)" opacity="0.9"/>
+      <!-- Glass rear -->
+      <path d="M265 128 L360 110 L355 145 L255 165Z" fill="url(#glassGrad)" opacity="0.7"/>
+      <!-- Glass mid -->
+      <path d="M370 108 L520 106 L515 142 L375 143Z" fill="url(#glassGrad)" opacity="0.8"/>
+      <!-- Door lines -->
+      <line x1="390" y1="143" x2="380" y2="265" stroke="#444" stroke-width="1.5"/>
+      <line x1="540" y1="142" x2="545" y2="268" stroke="#444" stroke-width="1.5"/>
+      <!-- Side accent stripe -->
+      <path d="M105 240 L800 235" stroke="#c9a84c" stroke-width="1.5" opacity="0.5"/>
+      <!-- Front headlight -->
+      <ellipse cx="790" cy="230" rx="22" ry="12" fill="#c9a84c" opacity="0.9" filter="url(#glow)"/>
+      <ellipse cx="790" cy="230" rx="14" ry="7" fill="#fff" opacity="0.8"/>
+      <!-- Rear taillight -->
+      <rect x="90" y="220" width="28" height="18" rx="3" fill="#c0392b" opacity="0.9"/>
+      <rect x="95" y="224" width="18" height="10" rx="2" fill="#ff6b6b" opacity="0.8"/>
+      <!-- Front wheel -->
+      <circle cx="660" cy="300" r="60" fill="#111" stroke="#333" stroke-width="2"/>
+      <circle cx="660" cy="300" r="60" fill="url(#wheelGrad)"/>
+      <circle cx="660" cy="300" r="38" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.5"/>
+      <circle cx="660" cy="300" r="16" fill="#333"/>
+      <!-- Spokes front -->
+      <line x1="660" y1="262" x2="660" y2="338" stroke="#555" stroke-width="3"/>
+      <line x1="622" y1="300" x2="698" y2="300" stroke="#555" stroke-width="3"/>
+      <line x1="633" y1="273" x2="687" y2="327" stroke="#555" stroke-width="2.5"/>
+      <line x1="687" y1="273" x2="633" y2="327" stroke="#555" stroke-width="2.5"/>
+      <!-- Rear wheel -->
+      <circle cx="220" cy="300" r="60" fill="#111" stroke="#333" stroke-width="2"/>
+      <circle cx="220" cy="300" r="60" fill="url(#wheelGrad)"/>
+      <circle cx="220" cy="300" r="38" fill="none" stroke="#c9a84c" stroke-width="1.5" opacity="0.5"/>
+      <circle cx="220" cy="300" r="16" fill="#333"/>
+      <!-- Spokes rear -->
+      <line x1="220" y1="262" x2="220" y2="338" stroke="#555" stroke-width="3"/>
+      <line x1="182" y1="300" x2="258" y2="300" stroke="#555" stroke-width="3"/>
+      <line x1="193" y1="273" x2="247" y2="327" stroke="#555" stroke-width="2.5"/>
+      <line x1="247" y1="273" x2="193" y2="327" stroke="#555" stroke-width="2.5"/>
+      <!-- Bottom skirt -->
+      <path d="M80 280 L820 280 L820 295 L80 295Z" fill="#0d0d0d"/>
+      <!-- Front bumper accent -->
+      <path d="M780 270 L820 260 L820 285 L785 285Z" fill="#c9a84c" opacity="0.4"/>
+    </svg>
+
+    <p class="hero-eyebrow">— The Apex Collection 2025</p>
+    <h1 class="hero-title">Drive<br><em>Legends.</em></h1>
+    <p class="hero-sub">Premium vehicles for those who define their own road. Every car is a statement. Every drive is a story.</p>
+    <div class="hero-actions">
+      <a href="#inventory" class="btn-primary">Explore Inventory</a>
+      <a href="#featured" class="btn-outline">View Featured</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">840+</div><div class="stat-label">Vehicles</div></div>
+      <div class="stat"><div class="stat-num">18</div><div class="stat-label">Brands</div></div>
+      <div class="stat"><div class="stat-num">12K</div><div class="stat-label">Clients</div></div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-track" id="tickerTrack"></div>
+  </div>
+
+  <!-- INVENTORY -->
+  <section id="inventory">
+    <div class="reveal">
+      <p class="section-label">— Our Collection</p>
+      <h2 class="section-title">Premium <em>Fleet</em></h2>
+    </div>
+
+    <div class="search-wrap reveal">
+      <input class="search-input" type="text" id="searchInput" placeholder="Search by brand, model, type..."/>
+      <button class="search-btn" onclick="doSearch()">Search</button>
+    </div>
+
+    <div class="filter-bar reveal" id="filterBar">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="sedan">Sedan</button>
+      <button class="filter-btn" data-filter="suv">SUV</button>
+      <button class="filter-btn" data-filter="sports">Sports</button>
+      <button class="filter-btn" data-filter="electric">Electric</button>
+      <button class="filter-btn" data-filter="luxury">Luxury</button>
+      <button class="filter-btn" data-filter="truck">Truck</button>
+    </div>
+
+    <div class="cars-grid" id="carsGrid"></div>
+  </section>
+
+  <!-- FEATURED -->
+  <section class="featured" id="featured">
+    <div class="featured-inner">
+      <div class="featured-text reveal">
+        <p class="section-label">— Car of the Month</p>
+        <h2 class="section-title">Lamborghini<br><em>Huracán</em></h2>
+        <div class="featured-price-tag">₹3.97 CR</div>
+        <p class="featured-desc">The Huracán is not just a car — it's a masterpiece of Italian engineering. With its naturally aspirated V10 roaring at 8,000 rpm and a sculpted body that cuts through air like a blade, this is what driving nirvana feels like.</p>
+        <div class="featured-spec-list">
+          <div class="featured-spec-item"><div class="fsi-label">Engine</div><div class="fsi-val">5.2L V10</div></div>
+          <div class="featured-spec-item"><div class="fsi-label">Power</div><div class="fsi-val">630 HP</div></div>
+          <div class="featured-spec-item"><div class="fsi-label">0–100 km/h</div><div class="fsi-val">2.9 SEC</div></div>
+          <div class="featured-spec-item"><div class="fsi-label">Top Speed</div><div class="fsi-val">325 KM/H</div></div>
+        </div>
+        <a href="#" class="btn-primary" onclick="openModal('lamborghini'); return false;">Configure Yours →</a>
+      </div>
+      <div class="featured-visual reveal">
+        <div class="featured-glow"></div>
+        <span style="position:relative;z-index:1">🏎️</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRANDS -->
+  <section class="brands" id="brands">
+    <div class="reveal">
+      <p class="section-label">— Our Partners</p>
+      <h2 class="section-title">World-Class <em>Brands</em></h2>
+    </div>
+    <div class="brands-grid reveal">
+      <div class="brand-item"><div class="brand-icon">🏎️</div><div class="brand-name">Ferrari</div></div>
+      <div class="brand-item"><div class="brand-icon">⚡</div><div class="brand-name">Tesla</div></div>
+      <div class="brand-item"><div class="brand-icon">🚗</div><div class="brand-name">Mercedes</div></div>
+      <div class="brand-item"><div class="brand-icon">🏁</div><div class="brand-name">Porsche</div></div>
+      <div class="brand-item"><div class="brand-icon">👑</div><div class="brand-name">Rolls Royce</div></div>
+      <div class="brand-item"><div class="brand-icon">💎</div><div class="brand-name">Bentley</div></div>
+      <div class="brand-item"><div class="brand-icon">🔥</div><div class="brand-name">Lamborghini</div></div>
+      <div class="brand-item"><div class="brand-icon">🚙</div><div class="brand-name">BMW</div></div>
+    </div>
+  </section>
+
+  <!-- WHY US -->
+  <section class="why" id="about">
+    <div class="reveal">
+      <p class="section-label">— Why Apex Motors</p>
+      <h2 class="section-title">The Apex <em>Difference</em></h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card reveal">
+        <div class="why-icon">🔍</div>
+        <div class="why-title">Curated Selection</div>
+        <div class="why-desc">Every vehicle passes our 120-point inspection by certified engineers before it reaches you.</div>
+      </div>
+      <div class="why-card reveal">
+        <div class="why-icon">🛡️</div>
+        <div class="why-title">Lifetime Warranty</div>
+        <div class="why-desc">Full powertrain warranty on all certified pre-owned vehicles. Drive with complete confidence.</div>
+      </div>
+      <div class="why-card reveal">
+        <div class="why-icon">⚡</div>
+        <div class="why-title">Instant Finance</div>
+        <div class="why-desc">Get approved in 15 minutes. Competitive rates starting at 6.9% with flexible EMI plans.</div>
+      </div>
+      <div class="why-card reveal">
+        <div class="why-icon">🚀</div>
+        <div class="why-title">Home Delivery</div>
+        <div class="why-desc">We deliver your dream car to your doorstep, anywhere in India. White-glove service guaranteed.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <div class="reveal">
+      <p class="section-label">— Client Stories</p>
+      <h2 class="section-title">What Drivers <em>Say</em></h2>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">Apex Motors made buying my dream Porsche 911 an unforgettable experience. The team was impeccable, and the delivery was flawless. I couldn't ask for more.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">👨‍💼</div>
+          <div><div class="author-name">Rahul Mehta</div><div class="author-role">CEO, Mumbai</div></div>
+        </div>
+      </div>
+      <div class="testimonial reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">The finance process was lightning fast. My Tesla Model S was delivered to my home in Bangalore within 3 days. Exceptional service from start to finish.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">👩‍💻</div>
+          <div><div class="author-name">Priya Sharma</div><div class="author-role">Tech Entrepreneur, Bangalore</div></div>
+        </div>
+      </div>
+      <div class="testimonial reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">I've purchased three vehicles from Apex. The curation, the quality, the aftercare — there is simply no better place in India to buy a premium automobile.</p>
+        <div class="testimonial-author">
+          <div class="author-avatar">🧔</div>
+          <div><div class="author-name">Vikram Nair</div><div class="author-role">Investor, Delhi</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section" id="contact">
+    <p class="section-label" style="color:rgba(0,0,0,0.5)">— Ready?</p>
+    <h2 class="section-title">Your Dream Car<br><em>Awaits</em></h2>
+    <p class="cta-desc">Schedule a private viewing or book a test drive today. Our specialists are ready.</p>
+    <button class="btn-dark" onclick="showContact()">Book a Consultation →</button>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand-name">APEX MOTORS</div>
+        <p class="footer-tagline">India's premier destination for premium and luxury automobiles. We don't just sell cars — we deliver experiences.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Inventory</div>
+        <ul class="footer-links">
+          <li><a href="#">New Arrivals</a></li>
+          <li><a href="#">Pre-Owned</a></li>
+          <li><a href="#">Electric</a></li>
+          <li><a href="#">SUVs</a></li>
+          <li><a href="#">Sports Cars</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Services</div>
+        <ul class="footer-links">
+          <li><a href="#">Test Drive</a></li>
+          <li><a href="#">Finance</a></li>
+          <li><a href="#">Trade-In</a></li>
+          <li><a href="#">Insurance</a></li>
+          <li><a href="#">Service</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <ul class="footer-links">
+          <li><a href="#">Mumbai Showroom</a></li>
+          <li><a href="#">Delhi Showroom</a></li>
+          <li><a href="#">Bangalore Showroom</a></li>
+          <li><a href="tel:+918001234567">+91 800 123 4567</a></li>
+          <li><a href="mailto:hello@apexmotors.in">hello@apexmotors.in</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 Apex Motors Pvt. Ltd. All rights reserved.</div>
+      <div class="footer-copy">Privacy Policy · Terms of Service · Cookies</div>
+    </div>
+  </footer>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // ---- CURSOR ----
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; cursor.style.left = mx + 'px'; cursor.style.top = my + 'px'; });
+    function animateRing() {
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    // ---- TICKER ----
+    const tickerItems = ['LAMBORGHINI HURACÁN','FERRARI 488','PORSCHE 911','TESLA MODEL S','MERCEDES AMG GT','BMW M8','ROLLS-ROYCE GHOST','BENTLEY CONTINENTAL','AUDI R8','MASERATI GHIBLI'];
+    const track = document.getElementById('tickerTrack');
+    const full = [...tickerItems, ...tickerItems];
+    track.innerHTML = full.map(t => `<span class="ticker-item">⬦ ${t}</span>`).join('');
+
+    // ---- VEHICLE DATA ----
+    const vehicles = [
+      { id:'ferrari', name:'Ferrari', model:'488 GTB', type:'sports', badge:'hot', emoji:'🏎️', hp:'660', speed:'330 km/h', acc:'3.0s', price:'₹4.02 CR', desc:'The Ferrari 488 GTB is the apex of turbocharged performance, born from decades of motorsport DNA. Twin-turbocharged V8 roars to life with an operatic crescendo.' },
+      { id:'tesla', name:'Tesla', model:'Model S Plaid', type:'electric', badge:'new', emoji:'⚡', hp:'1,020', speed:'322 km/h', acc:'2.1s', price:'₹1.48 CR', desc:'The fastest production sedan on the planet. Tri-motor all-wheel drive delivers mind-bending acceleration. Zero emissions, infinite thrills.' },
+      { id:'porsche', name:'Porsche', model:'911 Carrera 4S', type:'sports', badge:'', emoji:'🏁', hp:'450', speed:'306 km/h', acc:'3.6s', price:'₹2.33 CR', desc:'Sixty years of engineering perfection. The 911 is a sports car that doubles as a daily driver without compromise — the greatest all-rounder ever made.' },
+      { id:'bmwm8', name:'BMW', model:'M8 Competition', type:'luxury', badge:'sale', emoji:'🚗', hp:'625', speed:'305 km/h', acc:'3.2s', price:'₹2.19 CR', desc:'Where luxury meets racetrack aggression. The M8 Competition coupé is Bavaria\'s ultimate performance statement.' },
+      { id:'rr', name:'Rolls-Royce', model:'Ghost', type:'luxury', badge:'new', emoji:'👑', hp:'571', speed:'250 km/h', acc:'4.8s', price:'₹8.97 CR', desc:'Architecture of luxury. The Ghost\'s "post-opulence" interior is a sanctuary of silence and hand-crafted perfection. The world\'s finest motorcar.' },
+      { id:'bent', name:'Bentley', model:'Continental GT', type:'luxury', badge:'', emoji:'💎', hp:'626', speed:'333 km/h', acc:'3.6s', price:'₹4.10 CR', desc:'A GT car of extraordinary breadth. The Continental GT combines 6.0L W12 opulence with supercar performance on any road, in any country.' },
+      { id:'merc', name:'Mercedes-Benz', model:'AMG GT 63', type:'sedan', badge:'hot', emoji:'🚘', hp:'630', speed:'315 km/h', acc:'3.2s', price:'₹2.62 CR', desc:'The four-door coupé that makes a supercar blush. AMG\'s most versatile performance car blends family practicality with motorsport heartbeat.' },
+      { id:'lamborghini', name:'Lamborghini', model:'Huracán EVO', type:'sports', badge:'new', emoji:'🦖', hp:'640', speed:'325 km/h', acc:'2.9s', price:'₹3.97 CR', desc:'Naturally aspirated perfection. The Huracán\'s 5.2L V10 screams to 8,000 rpm with a soundtrack that rearranges your internal organs — gloriously.' },
+      { id:'audi', name:'Audi', model:'RS e-tron GT', type:'electric', badge:'new', emoji:'💡', hp:'646', speed:'250 km/h', acc:'3.3s', price:'₹1.94 CR', desc:'Electrifying the grand tourer. Quattro all-wheel drive, sculpted bodywork, and zero-emissions performance — Audi\'s electric masterpiece.' },
+      { id:'cayenne', name:'Porsche', model:'Cayenne Turbo GT', type:'suv', badge:'hot', emoji:'🚙', hp:'640', speed:'300 km/h', acc:'3.3s', price:'₹2.96 CR', desc:'The SUV that embarrasses sports cars on track. The Cayenne Turbo GT holds the Nürburgring SUV lap record. Utterly, magnificently useless logic.' },
+      { id:'gle', name:'Mercedes-Benz', model:'GLE 63 AMG S', type:'suv', badge:'', emoji:'🏔️', hp:'612', speed:'280 km/h', acc:'3.8s', price:'₹1.78 CR', desc:'Command every road. The GLE 63 AMG S fuses luxurious family capability with AMG\'s twin-turbo V8 fury for an uncompromising daily SUV.' },
+      { id:'raptor', name:'Ford', model:'F-150 Raptor R', type:'truck', badge:'new', emoji:'🛻', hp:'700', speed:'200 km/h', acc:'5.1s', price:'₹89 L', desc:'Off-road supremacy in production form. The Raptor R\'s supercharged 5.2L V8 conquers desert, trail, and highway with zero apologies.' },
+    ];
+
+    // ---- RENDER GRID ----
+    function renderGrid(list) {
+      const grid = document.getElementById('carsGrid');
+      grid.innerHTML = list.map(v => `
+        <div class="car-card" data-type="${v.type}" data-name="${v.name.toLowerCase()} ${v.model.toLowerCase()}">
+          <div class="car-img-wrap">
+            <span class="car-emoji">${v.emoji}</span>
+            ${v.badge ? `<span class="car-badge badge-${v.badge}">${v.badge}</span>` : ''}
+          </div>
+          <div class="car-body">
+            <div class="car-type">${v.type}</div>
+            <div class="car-name">${v.name}</div>
+            <div class="car-model">${v.model}</div>
+            <div class="car-specs">
+              <div class="spec"><div class="spec-val">${v.hp}</div><div class="spec-key">HP</div></div>
+              <div class="spec"><div class="spec-val">${v.acc}</div><div class="spec-key">0–100</div></div>
+              <div class="spec"><div class="spec-val">${v.speed.split(' ')[0]}</div><div class="spec-key">Top km/h</div></div>
+            </div>
+            <div class="car-footer">
+              <div><div class="car-price-label">Starting at</div><div class="car-price">${v.price}</div></div>
+              <button class="btn-card" onclick="openModal('${v.id}')">Details →</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+    renderGrid(vehicles);
+
+    // ---- FILTER ----
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const f = btn.dataset.filter;
+        const filtered = f === 'all' ? vehicles : vehicles.filter(v => v.type === f);
+        renderGrid(filtered);
+      });
+    });
+
+    // ---- SEARCH ----
+    function doSearch() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = q ? vehicles.filter(v => `${v.name} ${v.model} ${v.type}`.toLowerCase().includes(q)) : vehicles;
+      renderGrid(filtered);
+    }
+    document.getElementById('searchInput').addEventListener('keydown', e => { if(e.key === 'Enter') doSearch(); });
+
+    // ---- MODAL ----
+    function openModal(id) {
+      const v = vehicles.find(x => x.id === id);
+      if(!v) return;
+      document.getElementById('modalContent').innerHTML = `
+        <div class="car-type" style="margin-bottom:4px">${v.type}</div>
+        <div class="modal-title">${v.name} ${v.model}</div>
+        <div class="modal-price">${v.price}</div>
+        <div class="modal-detail">${v.desc}</div>
+        <div class="modal-specs">
+          <div class="modal-spec"><div class="modal-spec-k">Horsepower</div><div class="modal-spec-v">${v.hp} HP</div></div>
+          <div class="modal-spec"><div class="modal-spec-k">0 – 100 km/h</div><div class="modal-spec-v">${v.acc}</div></div>
+          <div class="modal-spec"><div class="modal-spec-k">Top Speed</div><div class="modal-spec-v">${v.speed}</div></div>
+          <div class="modal-spec"><div class="modal-spec-k">Category</div><div class="modal-spec-v">${v.type.toUpperCase()}</div></div>
+        </div>
+        <button class="btn-primary" style="width:100%;text-align:center" onclick="showContact()">Book a Test Drive →</button>
+      `;
+      document.getElementById('modal').classList.add('open');
+    }
+    function closeModal() { document.getElementById('modal').classList.remove('open'); }
+    document.getElementById('modal').addEventListener('click', e => { if(e.target.id==='modal') closeModal(); });
+
+    // ---- CONTACT ----
+    function showContact() {
+      document.getElementById('modalContent').innerHTML = `
+        <div class="modal-title">Book a Consultation</div>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:24px;line-height:1.7">Fill in your details and our specialist will reach out within 2 hours.</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <input style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:14px 18px;font-family:DM Sans,sans-serif;font-size:0.85rem;outline:none" placeholder="Full Name" />
+          <input style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:14px 18px;font-family:DM Sans,sans-serif;font-size:0.85rem;outline:none" placeholder="Phone Number" />
+          <input style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:14px 18px;font-family:DM Sans,sans-serif;font-size:0.85rem;outline:none" placeholder="Email Address" />
+          <select style="background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:14px 18px;font-family:DM Sans,sans-serif;font-size:0.85rem;outline:none">
+            <option>Select a Vehicle (Optional)</option>
+            ${vehicles.map(v=>`<option>${v.name} ${v.model}</option>`).join('')}
+          </select>
+          <button class="btn-primary" style="margin-top:8px" onclick="thankYou()">Submit Request →</button>
+        </div>
+      `;
+      document.getElementById('modal').classList.add('open');
+    }
+    function thankYou() {
+      document.getElementById('modalContent').innerHTML = `
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:4rem;margin-bottom:20px">✅</div>
+          <div class="modal-title">Request Received!</div>
+          <p style="color:var(--muted);font-size:0.88rem;line-height:1.7;margin-top:12px">Thank you. A specialist will contact you within 2 hours to schedule your private consultation and test drive.</p>
+          <button class="btn-primary" style="margin-top:28px" onclick="closeModal()">Close</button>
+        </div>
+      `;
+    }
+
+    // ---- SCROLL REVEAL ----
+    const reveals = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
+    }, { threshold: 0.12 });
+    reveals.forEach(r => io.observe(r));
+
+    // ---- NAV SCROLL ----
+    const nav = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      if(window.scrollY > 80) nav.style.background = 'rgba(10,10,10,0.97)';
+      else nav.style.background = '';
+    });
+  </script>
+</body>
+</html>
