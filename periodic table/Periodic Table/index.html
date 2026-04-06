@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3D Periodic Table</title>
+    <style>
+        html, body { height: 100%; }
+
+        body {
+            background-color: #000;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        a { color: #fff; }
+
+        /* ── Top title ── */
+        #info {
+            position: absolute;
+            width: 100%;
+            color: #fff;
+            padding: 5px;
+            margin-top: 18px;
+            font-family: Monospace;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* ── Bottom menu ── */
+        #menu {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+        }
+
+        button {
+            color: rgba(127,255,255,.75);
+            background: transparent;
+            outline: 1px solid rgba(127,255,255,.75);
+            border: 0;
+            padding: 5px 10px;
+            cursor: pointer;
+            margin: 0 4px;
+            font-size: 14px;
+            font-family: Monospace;
+        }
+        button:hover  { background-color: rgba(0,255,255,.5); }
+        button:active { color:#000; background-color:rgba(0,255,255,.75); }
+
+        /* ── Legend ── */
+        #legend {
+            position: absolute;
+            top: 55px;
+            right: 12px;
+            z-index: 10;
+            background: rgba(0,0,0,.7);
+            border: 1px solid rgba(127,255,255,.3);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-family: Monospace;
+            font-size: 11px;
+            line-height: 1.9;
+            color: rgba(200,230,255,.85);
+        }
+        #legend h4 {
+            margin: 0 0 5px 0;
+            font-size: 11px;
+            color: rgba(0,255,255,.9);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .leg { display:flex; align-items:center; gap:7px; }
+        .leg-dot { width:9px; height:9px; border-radius:2px; flex-shrink:0; }
+
+        /* ── Element cards ── */
+        .element {
+            width: 140px;
+            height: 180px;
+            border: 1px solid rgba(127,255,255,.25);
+            cursor: pointer;
+            transition: box-shadow .15s, border-color .15s;
+            position: relative;
+        }
+        .element:hover {
+            box-shadow: 0 0 25px var(--gc, rgba(0,255,255,.8)) !important;
+            border-color: var(--bc, rgba(127,255,255,.8)) !important;
+        }
+        .element .number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 20px;
+            color: rgba(127,255,255,.75);
+        }
+        .element .symbol {
+            position: absolute;
+            top: 40px;
+            width: 100%;
+            font-size: 70px;
+            text-align: center;
+            color: rgba(255,255,255,.75);
+            font-weight: bold;
+            filter: drop-shadow(0 0 18px rgba(0,255,255,.9));
+        }
+        .element .details {
+            position: absolute;
+            top: 130px;
+            width: 100%;
+            font-size: 16px;
+            text-align: center;
+            color: rgba(127,255,255,.75);
+            line-height: 1.4;
+        }
+
+        /* ── POPUP ── */
+        #overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.65);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+        #overlay.show { display: flex; }
+
+        #popup {
+            width: 360px;
+            max-width: 92vw;
+            background: #040f1e;
+            border: 1px solid var(--pc, rgba(0,255,255,.5));
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 50px var(--ps, rgba(0,255,255,.2));
+            animation: popIn .25s ease;
+            position: relative;
+        }
+        @keyframes popIn {
+            from { transform: scale(.88); opacity:0; }
+            to   { transform: scale(1);  opacity:1; }
+        }
+
+        #pop-header {
+            display: flex;
+            gap: 16px;
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid rgba(255,255,255,.06);
+        }
+        #pop-symbol-box {
+            width: 84px;
+            height: 96px;
+            flex-shrink: 0;
+            border: 1px solid var(--pc, rgba(0,255,255,.4));
+            border-radius: 6px;
+            background: rgba(0,0,0,.4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #pop-anum {
+            font-family: Monospace;
+            font-size: 13px;
+            color: rgba(180,210,255,.6);
+        }
+        #pop-sym {
+            font-family: Arial Black, Arial, sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1;
+            filter: drop-shadow(0 0 10px var(--pc, rgba(0,255,255,.9)));
+        }
+        #pop-info { flex:1; padding-top:4px; }
+        #pop-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+        #pop-cat {
+            display: inline-block;
+            font-family: Monospace;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 3px 9px;
+            border-radius: 20px;
+            border: 1px solid var(--pc, rgba(0,255,255,.5));
+            color: var(--pc, rgba(0,255,255,.9));
+            margin-bottom: 8px;
+        }
+        #pop-mass-label {
+            font-family: Monospace;
+            font-size: 12px;
+            color: rgba(150,190,230,.65);
+        }
+        #pop-mass-val {
+            font-family: Monospace;
+            font-size: 15px;
+            color: rgba(220,240,255,.9);
+        }
+        #pop-close {
+            position: absolute;
+            top: 12px; right: 12px;
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,.25);
+            background: rgba(255,255,255,.07);
+            color: rgba(255,255,255,.65);
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            outline: none;
+        }
+        #pop-close:hover { background: rgba(255,255,255,.18); color:#fff; }
+
+        #pop-body { padding: 14px 20px 20px; }
+
+        .pop-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,.04);
+            font-family: Monospace;
+            font-size: 13px;
+        }
+        .pop-row:last-of-type { border-bottom: none; }
+        .pop-lbl { color: rgba(140,180,220,.6); font-size: 11px; text-transform:uppercase; letter-spacing:.8px; }
+        .pop-val { color: rgba(220,240,255,.9); font-weight:bold; }
+
+        #pop-desc {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: rgba(0,200,220,.05);
+            border-left: 2px solid var(--pc, rgba(0,255,255,.4));
+            border-radius: 0 4px 4px 0;
+            font-family: Monospace;
+            font-size: 12px;
+            color: rgba(160,200,240,.75);
+            line-height: 1.65;
+        }
+    </style>
+</head>
+<body>
+
+    <script src="js/three.min.js"></script>
+    <script src="js/tween.min.js"></script>
+    <script src="js/controls/TrackballControls.js"></script>
+    <script src="js/renderers/CSS3DRenderer.js"></script>
+
+    <div id="info">&#9883; 3D Periodic Table</div>
+
+    <div id="legend">
+        <h4>Element Types</h4>
+        <div class="leg"><div class="leg-dot" style="background:#00e5ff"></div>Nonmetal</div>
+        <div class="leg"><div class="leg-dot" style="background:#ff6b6b"></div>Alkali Metal</div>
+        <div class="leg"><div class="leg-dot" style="background:#ff9f43"></div>Alkaline Earth</div>
+        <div class="leg"><div class="leg-dot" style="background:#a29bfe"></div>Transition Metal</div>
+        <div class="leg"><div class="leg-dot" style="background:#74b9ff"></div>Post-Trans. Metal</div>
+        <div class="leg"><div class="leg-dot" style="background:#55efc4"></div>Metalloid</div>
+        <div class="leg"><div class="leg-dot" style="background:#fd79a8"></div>Halogen</div>
+        <div class="leg"><div class="leg-dot" style="background:#81ecec"></div>Noble Gas</div>
+        <div class="leg"><div class="leg-dot" style="background:#ffeaa7"></div>Lanthanide</div>
+        <div class="leg"><div class="leg-dot" style="background:#fab1a0"></div>Actinide</div>
+    </div>
+
+    <div id="container"></div>
+
+    <div id="menu">
+        <button id="table">TABLE</button>
+        <button id="sphere">SPHERE</button>
+        <button id="helix">HELIX</button>
+        <button id="grid">GRID</button>
+    </div>
+
+    <!-- POPUP -->
+    <div id="overlay">
+        <div id="popup">
+            <div id="pop-header">
+                <div id="pop-symbol-box">
+                    <div id="pop-anum"></div>
+                    <div id="pop-sym"></div>
+                </div>
+                <div id="pop-info">
+                    <div id="pop-name"></div>
+                    <div id="pop-cat"></div>
+                    <div id="pop-mass-label">Atomic Mass</div>
+                    <div id="pop-mass-val"></div>
+                </div>
+                <button id="pop-close">&#10005;</button>
+            </div>
+            <div id="pop-body">
+                <div class="pop-row">
+                    <span class="pop-lbl">Group</span>
+                    <span class="pop-val" id="pop-group"></span>
+                </div>
+                <div class="pop-row">
+                    <span class="pop-lbl">Period</span>
+                    <span class="pop-val" id="pop-period"></span>
+                </div>
+                <div class="pop-row">
+                    <span class="pop-lbl">Atomic Number</span>
+                    <span class="pop-val" id="pop-z"></span>
+                </div>
+                <div class="pop-row">
+                    <span class="pop-lbl">Category</span>
+                    <span class="pop-val" id="pop-cat2"></span>
+                </div>
+                <div id="pop-desc"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+    // ── Element data ──────────────────────────────────────────────────────────
+    // [symbol, name, mass, group, period, category, description]
+    var table = [
+        ["H",  "Hydrogen",     "1.00794",   1, 1, "nonmetal",      "The lightest element; makes up 75% of all normal matter by mass. Forms water when combined with oxygen."],
+        ["He", "Helium",       "4.002602",  18,1, "noble-gas",     "Second most abundant element in the universe. Inert and used in balloons and cryogenics."],
+        ["Li", "Lithium",      "6.941",     1, 2, "alkali-metal",  "Lightest solid metal. Used in rechargeable batteries and psychiatric medication."],
+        ["Be", "Beryllium",    "9.012182",  2, 2, "alkaline-earth","Lightweight rigid metal. Used in aerospace structures and nuclear applications."],
+        ["B",  "Boron",        "10.811",    13,2, "metalloid",     "Used in glass, ceramics and detergents. Has unique electron-deficient bonding chemistry."],
+        ["C",  "Carbon",       "12.0107",   14,2, "nonmetal",      "Basis of all known life. Forms diamonds, graphite, graphene and fullerenes."],
+        ["N",  "Nitrogen",     "14.0067",   15,2, "nonmetal",      "Makes up 78% of Earth's atmosphere. Essential for amino acids and DNA."],
+        ["O",  "Oxygen",       "15.9994",   16,2, "nonmetal",      "Essential for respiration. Third most abundant element in the universe by mass."],
+        ["F",  "Fluorine",     "18.9984",   17,2, "halogen",       "Most electronegative element. Highly reactive; used in toothpaste and Teflon."],
+        ["Ne", "Neon",         "20.1797",   18,2, "noble-gas",     "Famous for its red-orange glow in neon signs. Completely chemically inert."],
+        ["Na", "Sodium",       "22.98976",  1, 3, "alkali-metal",  "Highly reactive soft metal. Essential for nerve function. Key component of table salt."],
+        ["Mg", "Magnesium",    "24.305",    2, 3, "alkaline-earth","Burns with brilliant white flame. Used in alloys, fireworks and dietary supplements."],
+        ["Al", "Aluminium",    "26.9815",   13,3, "post-trans",    "Most abundant metal in Earth's crust. Lightweight and corrosion-resistant."],
+        ["Si", "Silicon",      "28.0855",   14,3, "metalloid",     "Foundation of the semiconductor industry. Second most abundant element in the crust."],
+        ["P",  "Phosphorus",   "30.97376",  15,3, "nonmetal",      "Essential for DNA and cell membranes. White phosphorus is highly toxic and flammable."],
+        ["S",  "Sulfur",       "32.065",    16,3, "nonmetal",      "Yellow solid with distinctive smell. Used in vulcanization of rubber and fertilizers."],
+        ["Cl", "Chlorine",     "35.453",    17,3, "halogen",       "Pale green toxic gas used in water purification and the manufacture of PVC."],
+        ["Ar", "Argon",        "39.948",    18,3, "noble-gas",     "Most abundant noble gas in Earth's atmosphere. Used in welding and light bulbs."],
+        ["K",  "Potassium",    "39.0983",   1, 4, "alkali-metal",  "Essential electrolyte for cells. Reacts violently with water, producing hydrogen gas."],
+        ["Ca", "Calcium",      "40.078",    2, 4, "alkaline-earth","Fifth most abundant element. Essential for bones, teeth and muscle function."],
+        ["Sc", "Scandium",     "44.95591",  3, 4, "transition",    "Rare silvery metal used in aerospace alloys, sports equipment and sodium lamps."],
+        ["Ti", "Titanium",     "47.867",    4, 4, "transition",    "Strong, lightweight, corrosion-resistant. Widely used in aircraft and medical implants."],
+        ["V",  "Vanadium",     "50.9415",   5, 4, "transition",    "Increases strength of steel alloys. Named after the Norse goddess of beauty, Vanadis."],
+        ["Cr", "Chromium",     "51.9961",   6, 4, "transition",    "Gives stainless steel its corrosion resistance. Used in chrome plating and pigments."],
+        ["Mn", "Manganese",    "54.93804",  7, 4, "transition",    "Essential trace element. Widely used in steel production and dry cell batteries."],
+        ["Fe", "Iron",         "55.845",    8, 4, "transition",    "Most used metal on Earth. Makes up the planet's core. Foundation of steel and civilization."],
+        ["Co", "Cobalt",       "58.93319",  9, 4, "transition",    "Used in magnets, batteries and blue pigments. Key component of vitamin B12."],
+        ["Ni", "Nickel",       "58.6934",   10,4, "transition",    "Highly corrosion-resistant. Used in coins, alloys and rechargeable batteries."],
+        ["Cu", "Copper",       "63.546",    11,4, "transition",    "Best natural electrical conductor after silver. Has antimicrobial properties. Used since antiquity."],
+        ["Zn", "Zinc",         "65.38",     12,4, "transition",    "Essential mineral for humans. Used in galvanizing steel, making brass and sunscreen."],
+        ["Ga", "Gallium",      "69.723",    13,4, "post-trans",    "Melts in your hand at just 29.8°C. Used in semiconductors and blue-ray LEDs."],
+        ["Ge", "Germanium",    "72.63",     14,4, "metalloid",     "Predicted by Mendeleev before its discovery. Used in fiber optics and infrared optics."],
+        ["As", "Arsenic",      "74.9216",   15,4, "metalloid",     "Notorious historical poison. Also used in semiconductors and wood preservatives."],
+        ["Se", "Selenium",     "78.96",     16,4, "nonmetal",      "Essential trace element. Used in photocopiers, solar cells and anti-dandruff shampoo."],
+        ["Br", "Bromine",      "79.904",    17,4, "halogen",       "One of only two liquid elements at room temperature. Dense, pungent red-brown liquid."],
+        ["Kr", "Krypton",      "83.798",    18,4, "noble-gas",     "Used in high-performance light bulbs. Also the name of Superman's home planet!"],
+        ["Rb", "Rubidium",     "85.4678",   1, 5, "alkali-metal",  "Ignites spontaneously in air. Used in atomic clocks and GPS navigation systems."],
+        ["Sr", "Strontium",    "87.62",     2, 5, "alkaline-earth","Creates brilliant red color in fireworks. Chemically similar to calcium."],
+        ["Y",  "Yttrium",      "88.90585",  3, 5, "transition",    "Named after Ytterby, Sweden. Used in LEDs, lasers and high-temperature superconductors."],
+        ["Zr", "Zirconium",    "91.224",    4, 5, "transition",    "Extremely corrosion-resistant. Widely used in nuclear reactor cores and in jewelry."],
+        ["Nb", "Niobium",      "92.90638",  5, 5, "transition",    "Used in superalloys for jet engines and in superconducting magnets for MRI machines."],
+        ["Mo", "Molybdenum",   "95.96",     6, 5, "transition",    "Very high melting point. Essential alloying element in high-strength steel."],
+        ["Tc", "Technetium",   "(98)",      7, 5, "transition",    "First artificially produced element. All isotopes are radioactive. Used in medical imaging."],
+        ["Ru", "Ruthenium",    "101.07",    8, 5, "transition",    "Hard, rare platinum-group metal. Used as catalyst and in electronics."],
+        ["Rh", "Rhodium",      "102.905",   9, 5, "transition",    "One of the most expensive elements. Used in catalytic converters and jewelry."],
+        ["Pd", "Palladium",    "106.42",    10,5, "transition",    "Can absorb up to 900 times its volume of hydrogen. Key in catalytic converters."],
+        ["Ag", "Silver",       "107.868",   11,5, "transition",    "Best electrical and thermal conductor of all metals. Antimicrobial. Used in coins and mirrors."],
+        ["Cd", "Cadmium",      "112.411",   12,5, "transition",    "Toxic heavy metal used in rechargeable nickel-cadmium batteries and nuclear reactor control."],
+        ["In", "Indium",       "114.818",   13,5, "post-trans",    "Soft and malleable. Used in indium tin oxide (ITO) for LCD and touchscreen displays."],
+        ["Sn", "Tin",          "118.71",    14,5, "post-trans",    "One of the first metals used by humans. Main component of bronze. Used in solder."],
+        ["Sb", "Antimony",     "121.76",    15,5, "metalloid",     "Used in flame retardants, lead-acid batteries and semiconductors."],
+        ["Te", "Tellurium",    "127.6",     16,5, "metalloid",     "Rare metalloid added to steel and copper alloys. Also used in solar panels."],
+        ["I",  "Iodine",       "126.904",   17,5, "halogen",       "Essential for thyroid hormones. Used as antiseptic and in photography film."],
+        ["Xe", "Xenon",        "131.293",   18,5, "noble-gas",     "Used in ion propulsion engines for spacecraft and in high-intensity lamps."],
+        ["Cs", "Caesium",      "132.905",   1, 6, "alkali-metal",  "Defines the SI second via atomic clocks. Reacts explosively with water."],
+        ["Ba", "Barium",       "137.327",   2, 6, "alkaline-earth","Creates green color in fireworks. Used as contrast agent in medical X-rays (barium meal)."],
+        ["La", "Lanthanum",    "138.905",   4, 9, "lanthanide",    "Soft, malleable metal used in high-end camera and telescope lenses and battery electrodes."],
+        ["Ce", "Cerium",       "140.116",   5, 9, "lanthanide",    "Most abundant rare earth. Used in catalytic converters and as a glass polishing agent."],
+        ["Pr", "Praseodymium", "140.907",   6, 9, "lanthanide",    "Combined with neodymium to create powerful permanent magnets for aircraft engines."],
+        ["Nd", "Neodymium",    "144.242",   7, 9, "lanthanide",    "Makes the strongest permanent magnets known to science. Found in every electric motor."],
+        ["Pm", "Promethium",   "(145)",     8, 9, "lanthanide",    "Radioactive lanthanide with no stable isotopes. Found only in trace amounts in nature."],
+        ["Sm", "Samarium",     "150.36",    9, 9, "lanthanide",    "Used in samarium-cobalt magnets that work well at high temperatures."],
+        ["Eu", "Europium",     "151.964",   10,9, "lanthanide",    "Used in euro banknote phosphors as an anti-counterfeiting measure and in TV red phosphors."],
+        ["Gd", "Gadolinium",   "157.25",    11,9, "lanthanide",    "Used as contrast agent in MRI scans. Has the highest neutron absorption cross-section."],
+        ["Tb", "Terbium",      "158.925",   12,9, "lanthanide",    "Used in green phosphors for TV screens and in magneto-optical data storage."],
+        ["Dy", "Dysprosium",   "162.5",     13,9, "lanthanide",    "Added to neodymium magnets to improve performance at high temperatures in EV motors."],
+        ["Ho", "Holmium",      "164.930",   14,9, "lanthanide",    "Has the highest magnetic moment of any element. Used in high-strength magnets."],
+        ["Er", "Erbium",       "167.259",   15,9, "lanthanide",    "Used in fiber-optic amplifiers and gives glass and crystals a pink color."],
+        ["Tm", "Thulium",      "168.934",   16,9, "lanthanide",    "Rarest stable lanthanide. Used in portable X-ray devices as radiation source."],
+        ["Yb", "Ytterbium",    "173.054",   17,9, "lanthanide",    "Used in the most accurate atomic clocks and as a dopant in optical fibers."],
+        ["Lu", "Lutetium",     "174.966",   18,9, "lanthanide",    "Densest and hardest lanthanide. Used in PET scan detectors."],
+        ["Hf", "Hafnium",      "178.49",    4, 6, "transition",    "Used in nuclear reactor control rods and in modern semiconductor microchips (Intel)."],
+        ["Ta", "Tantalum",     "180.947",   5, 6, "transition",    "Extremely corrosion-resistant. Used in capacitors, surgical implants and aircraft parts."],
+        ["W",  "Tungsten",     "183.84",    6, 6, "transition",    "Highest melting point of all elements (3422°C). Used in light bulb filaments and cutting tools."],
+        ["Re", "Rhenium",      "186.207",   7, 6, "transition",    "Second highest melting point of any element. Used in jet engine superalloys."],
+        ["Os", "Osmium",       "190.23",    8, 6, "transition",    "Densest naturally occurring element. Hardest platinum-group metal. Bluish-white appearance."],
+        ["Ir", "Iridium",      "192.217",   9, 6, "transition",    "Most corrosion-resistant metal. Used in spark plugs, crucibles and the international kg prototype."],
+        ["Pt", "Platinum",     "195.084",   10,6, "transition",    "Highly valuable catalyst. Used in jewelry, catalytic converters and cancer treatment drugs."],
+        ["Au", "Gold",         "196.966",   11,6, "transition",    "Symbol of wealth for millennia. Does not tarnish or corrode. Excellent electrical conductor."],
+        ["Hg", "Mercury",      "200.59",    12,6, "transition",    "Only liquid metal at room temperature. Used in thermometers, switches and dental amalgam."],
+        ["Tl", "Thallium",     "204.383",   13,6, "post-trans",    "Highly toxic. Used in infrared detectors and was historically used as rat poison."],
+        ["Pb", "Lead",         "207.2",     14,6, "post-trans",    "Dense soft metal. Used in car batteries and radiation shielding. Toxic in old water pipes."],
+        ["Bi", "Bismuth",      "208.980",   15,6, "post-trans",    "Heaviest stable element. Used in pharmaceuticals, cosmetics and alloys with low melting points."],
+        ["Po", "Polonium",     "(209)",     16,6, "post-trans",    "Highly radioactive. Discovered by Marie Curie. Used in anti-static devices and nuclear warheads."],
+        ["At", "Astatine",     "(210)",     17,6, "halogen",       "Rarest naturally occurring element on Earth. Highly radioactive halogen."],
+        ["Rn", "Radon",        "(222)",     18,6, "noble-gas",     "Radioactive gas produced by uranium decay. A significant cause of indoor radiation exposure."],
+        ["Fr", "Francium",     "(223)",     1, 7, "alkali-metal",  "Most unstable naturally occurring element. Extremely rare; only fractions of a gram exist at once."],
+        ["Ra", "Radium",       "(226)",     2, 7, "alkaline-earth","Highly radioactive. Used historically in luminous paint (radium watches). Discovered by Marie Curie."],
+        ["Ac", "Actinium",     "(227)",     4,10, "actinide",      "Glows blue due to intense radioactivity. Used in cancer treatment research (targeted alpha therapy)."],
+        ["Th", "Thorium",      "232.038",   5,10, "actinide",      "Radioactive. Proposed as a safer alternative nuclear fuel as it is more abundant than uranium."],
+        ["Pa", "Protactinium", "231.035",   6,10, "actinide",      "Dense, silvery metal. Toxic and highly radioactive. Primarily used in nuclear research."],
+        ["U",  "Uranium",      "238.028",   7,10, "actinide",      "Primary fuel for nuclear reactors and was used in the first atomic bombs. Very dense metal."],
+        ["Np", "Neptunium",    "(237)",     8,10, "actinide",      "First transuranium element to be synthesized. Used in neutron detection instruments."],
+        ["Pu", "Plutonium",    "(244)",     9,10, "actinide",      "Used in nuclear weapons and reactors. Some isotopes are used as power sources in spacecraft."],
+        ["Am", "Americium",    "(243)",     10,10,"actinide",      "Used in household smoke detectors. Synthetic radioactive transuranium element."],
+        ["Cm", "Curium",       "(247)",     11,10,"actinide",      "Named after Marie and Pierre Curie. Used as power source in alpha-particle X-ray spectrometers."],
+        ["Bk", "Berkelium",    "(247)",     12,10,"actinide",      "Named after Berkeley, California. Synthetic and radioactive with no significant practical uses yet."],
+        ["Cf", "Californium",  "(251)",     13,10,"actinide",      "Powerful neutron emitter. Used in nuclear reactor start-up sources and metal detectors."],
+        ["Es", "Einsteinium",  "(252)",     14,10,"actinide",      "Named after Einstein. First discovered in the fallout of the first hydrogen bomb test in 1952."],
+        ["Fm", "Fermium",      "(257)",     15,10,"actinide",      "Named after Enrico Fermi. Also found in H-bomb fallout. No commercial uses."],
+        ["Md", "Mendelevium",  "(258)",     16,10,"actinide",      "Named after Dmitri Mendeleev, creator of the periodic table."],
+        ["No", "Nobelium",     "(259)",     17,10,"actinide",      "Named after Alfred Nobel. Synthetic and highly unstable."],
+        ["Lr", "Lawrencium",   "(262)",     18,10,"actinide",      "Named after Ernest Lawrence. The last actinide element in the table."],
+        ["Rf", "Rutherfordium","(267)",     4, 7, "transition",    "Named after Ernest Rutherford. Synthetic superheavy element produced in particle accelerators."],
+        ["Db", "Dubnium",      "(268)",     5, 7, "transition",    "Named after Dubna, Russia. Highly radioactive synthetic element."],
+        ["Sg", "Seaborgium",   "(271)",     6, 7, "transition",    "Named after Glenn Seaborg. Only a few atoms produced; very short half-life."],
+        ["Bh", "Bohrium",      "(272)",     7, 7, "transition",    "Named after Niels Bohr. Extremely unstable; only a handful of atoms ever made."],
+        ["Hs", "Hassium",      "(270)",     8, 7, "transition",    "Named after Hesse, Germany. Synthetic superheavy transactinide element."],
+        ["Mt", "Meitnerium",   "(276)",     9, 7, "transition",    "Named after Lise Meitner. Only produced in heavy-ion particle accelerators."],
+        ["Ds", "Darmstadtium", "(281)",     10,7, "transition",    "Named after Darmstadt, Germany. Extremely unstable synthetic element."],
+        ["Rg", "Roentgenium",  "(280)",     11,7, "transition",    "Named after Wilhelm Röntgen, discoverer of X-rays. Synthetic superheavy element."],
+        ["Cn", "Copernicium",  "(285)",     12,7, "transition",    "Named after Copernicus. Predicted to behave more like a noble gas than a metal."],
+        ["Nh", "Nihonium",     "(284)",     13,7, "post-trans",    "Named after Japan (Nihon). First element discovered in Asia, at RIKEN institute."],
+        ["Fl", "Flerovium",    "(289)",     14,7, "post-trans",    "Named after Flerov Laboratory. May behave like a noble gas despite being in group 14."],
+        ["Mc", "Moscovium",    "(288)",     15,7, "post-trans",    "Named after Moscow Oblast, Russia. Has an extremely short half-life of ~220 ms."],
+        ["Lv", "Livermorium",  "(293)",     16,7, "post-trans",    "Named after Lawrence Livermore National Laboratory. Highly radioactive."],
+        ["Ts", "Tennessine",   "(294)",     17,7, "halogen",       "Named after Tennessee. Second heaviest known element. Extremely radioactive."],
+        ["Og", "Oganesson",    "(294)",     18,7, "noble-gas",     "Heaviest known element. Named after physicist Yuri Oganessian. Half-life ~0.89 ms."]
+    ];
+
+    // ── Category colours ──────────────────────────────────────────────────────
+    var CAT = {
+        "nonmetal":       { bg:"rgba(0,55,75,",      border:"rgba(0,229,255,",     glow:"rgba(0,229,255,0.7)",    dot:"#00e5ff",   label:"Nonmetal" },
+        "alkali-metal":   { bg:"rgba(75,10,10,",     border:"rgba(255,107,107,",   glow:"rgba(255,107,107,0.7)",  dot:"#ff6b6b",   label:"Alkali Metal" },
+        "alkaline-earth": { bg:"rgba(65,38,0,",      border:"rgba(255,159,67,",    glow:"rgba(255,159,67,0.7)",   dot:"#ff9f43",   label:"Alkaline Earth Metal" },
+        "transition":     { bg:"rgba(28,18,72,",     border:"rgba(162,155,254,",   glow:"rgba(162,155,254,0.7)",  dot:"#a29bfe",   label:"Transition Metal" },
+        "post-trans":     { bg:"rgba(0,28,65,",      border:"rgba(116,185,255,",   glow:"rgba(116,185,255,0.7)",  dot:"#74b9ff",   label:"Post-Transition Metal" },
+        "metalloid":      { bg:"rgba(0,55,38,",      border:"rgba(85,239,196,",    glow:"rgba(85,239,196,0.7)",   dot:"#55efc4",   label:"Metalloid" },
+        "halogen":        { bg:"rgba(65,10,38,",     border:"rgba(253,121,168,",   glow:"rgba(253,121,168,0.7)",  dot:"#fd79a8",   label:"Halogen" },
+        "noble-gas":      { bg:"rgba(0,55,55,",      border:"rgba(129,236,236,",   glow:"rgba(129,236,236,0.7)",  dot:"#81ecec",   label:"Noble Gas" },
+        "lanthanide":     { bg:"rgba(48,42,0,",      border:"rgba(255,234,167,",   glow:"rgba(255,234,167,0.7)",  dot:"#ffeaa7",   label:"Lanthanide" },
+        "actinide":       { bg:"rgba(58,18,8,",      border:"rgba(250,177,160,",   glow:"rgba(250,177,160,0.7)",  dot:"#fab1a0",   label:"Actinide" }
+    };
+
+    // ── Scene setup ───────────────────────────────────────────────────────────
+    var camera, scene, renderer, controls;
+    var objects = [];
+    var targets = { table:[], sphere:[], helix:[], grid:[] };
+
+    init();
+    animate();
+
+    function init() {
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 1, 5000);
+        camera.position.z = 1800;
+
+        scene = new THREE.Scene();
+
+        for (var i = 0; i < table.length; i++) {
+            var item = table[i];
+            var cs   = CAT[item[5]] || CAT["nonmetal"];
+            var alpha = (Math.random() * 0.35 + 0.35).toFixed(2);
+
+            var el = document.createElement('div');
+            el.className = 'element';
+            el.style.backgroundColor = cs.bg + alpha + ')';
+            el.style.boxShadow       = '0 0 16px ' + cs.glow;
+            el.style.borderColor     = cs.border + '0.35)';
+            el.style.setProperty('--gc', cs.glow);
+            el.style.setProperty('--bc', cs.border + '0.85)');
+
+            var num = document.createElement('div');
+            num.className = 'number';
+            num.textContent = i + 1;
+            el.appendChild(num);
+
+            var sym = document.createElement('div');
+            sym.className = 'symbol';
+            sym.textContent = item[0];
+            el.appendChild(sym);
+
+            var det = document.createElement('div');
+            det.className = 'details';
+            det.innerHTML = item[1] + '<br>' + item[2];
+            el.appendChild(det);
+
+            // click → popup (ignore drags)
+            (function(elem, idx) {
+                var startX, startY;
+                elem.addEventListener('mousedown', function(e){ startX=e.clientX; startY=e.clientY; });
+                elem.addEventListener('click', function(e){
+                    var dx=e.clientX-startX, dy=e.clientY-startY;
+                    if (Math.sqrt(dx*dx+dy*dy) < 6) {
+                        e.stopPropagation();
+                        showPopup(idx);
+                    }
+                });
+            })(el, i);
+
+            var obj = new THREE.CSS3DObject(el);
+            obj.position.x = Math.random()*4000-2000;
+            obj.position.y = Math.random()*4000-2000;
+            obj.position.z = Math.random()*4000-2000;
+            scene.add(obj);
+            objects.push(obj);
+        }
+
+        // TABLE
+        for (var i=0; i<objects.length; i++) {
+            var item=table[i], t=new THREE.Object3D();
+            t.position.x = (item[3]*160)-1540;
+            t.position.y = -(item[4]*200)+1100;
+            targets.table.push(t);
+        }
+
+        // SPHERE
+        var v=new THREE.Vector3();
+        for (var i=0,l=objects.length; i<l; i++) {
+            var phi=Math.acos(-1+(2*i)/l), theta=Math.sqrt(l*Math.PI)*phi;
+            var t=new THREE.Object3D();
+            t.position.x=1000*Math.cos(theta)*Math.sin(phi);
+            t.position.y=1000*Math.sin(theta)*Math.sin(phi);
+            t.position.z=1000*Math.cos(phi);
+            v.copy(t.position).multiplyScalar(2);
+            t.lookAt(v);
+            targets.sphere.push(t);
+        }
+
+        // HELIX
+        for (var i=0,l=objects.length; i<l; i++) {
+            var phi=i*0.175+Math.PI;
+            var t=new THREE.Object3D();
+            t.position.x=1100*Math.sin(phi);
+            t.position.y=-(i*8)+450;
+            t.position.z=1100*Math.cos(phi);
+            v.copy(t.position); v.x*=2; v.z*=2;
+            t.lookAt(v);
+            targets.helix.push(t);
+        }
+
+        // GRID
+        for (var i=0; i<objects.length; i++) {
+            var t=new THREE.Object3D();
+            t.position.x=((i%5)*400)-800;
+            t.position.y=(-(Math.floor(i/5)%5)*400)+800;
+            t.position.z=(Math.floor(i/25))*1000-2000;
+            targets.grid.push(t);
+        }
+
+        renderer = new THREE.CSS3DRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.domElement.style.position = 'absolute';
+        renderer.domElement.style.top = 0;
+        document.getElementById('container').appendChild(renderer.domElement);
+
+        controls = new THREE.TrackballControls(camera, renderer.domElement);
+        controls.rotateSpeed = 0.5;
+        controls.addEventListener('change', render);
+
+        document.getElementById('table').addEventListener('click', function(){ transform(targets.table,2000); });
+        document.getElementById('sphere').addEventListener('click', function(){ transform(targets.sphere,2000); });
+        document.getElementById('helix').addEventListener('click', function(){ transform(targets.helix,2000); });
+        document.getElementById('grid').addEventListener('click', function(){ transform(targets.grid,2000); });
+
+        transform(targets.table, 5000);
+        window.addEventListener('resize', onWindowResize, false);
+    }
+
+    // ── Popup ─────────────────────────────────────────────────────────────────
+    function showPopup(idx) {
+        var item = table[idx];
+        var cs   = CAT[item[5]] || CAT["nonmetal"];
+        var color = cs.border + '0.7)';
+
+        var popup = document.getElementById('popup');
+        popup.style.setProperty('--pc', color);
+        popup.style.setProperty('--ps', cs.border + '0.2)');
+
+        document.getElementById('pop-anum').textContent   = idx + 1;
+        document.getElementById('pop-sym').textContent    = item[0];
+        document.getElementById('pop-name').textContent   = item[1];
+        document.getElementById('pop-cat').textContent    = cs.label;
+        document.getElementById('pop-cat').style.color    = cs.dot;
+        document.getElementById('pop-cat').style.borderColor = cs.dot;
+        document.getElementById('pop-mass-val').textContent  = item[2] + ' u';
+        document.getElementById('pop-group').textContent  = item[3];
+        document.getElementById('pop-period').textContent = item[4];
+        document.getElementById('pop-z').textContent      = idx + 1;
+        document.getElementById('pop-cat2').textContent   = cs.label;
+        document.getElementById('pop-desc').textContent   = item[6] || '';
+
+        document.getElementById('overlay').classList.add('show');
+        controls.enabled = false;
+    }
+
+    function hidePopup() {
+        document.getElementById('overlay').classList.remove('show');
+        controls.enabled = true;
+    }
+
+    document.getElementById('pop-close').addEventListener('click', hidePopup);
+    document.getElementById('overlay').addEventListener('click', function(e){ if(e.target===this) hidePopup(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') hidePopup(); });
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    function transform(targets, duration) {
+        TWEEN.removeAll();
+        for (var i=0; i<objects.length; i++) {
+            var obj=objects[i], tgt=targets[i];
+            new TWEEN.Tween(obj.position)
+                .to({x:tgt.position.x, y:tgt.position.y, z:tgt.position.z}, Math.random()*duration+duration)
+                .easing(TWEEN.Easing.Exponential.InOut).start();
+            new TWEEN.Tween(obj.rotation)
+                .to({x:tgt.rotation.x, y:tgt.rotation.y, z:tgt.rotation.z}, Math.random()*duration+duration)
+                .easing(TWEEN.Easing.Exponential.InOut).start();
+        }
+        new TWEEN.Tween(this).to({}, duration*2).onUpdate(render).start();
+    }
+
+    function onWindowResize() {
+        camera.aspect = window.innerWidth/window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        TWEEN.update();
+        controls.update();
+    }
+
+    function render() {
+        renderer.render(scene, camera);
+    }
+
+    </script>
+</body>
+</html>
